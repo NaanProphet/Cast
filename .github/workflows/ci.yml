@@ -48,10 +48,13 @@ jobs:
         sudo apt-get update
         sudo apt-get -y install qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static:register
+    - name: npm install
+      run: npm install
     - name: Run babel
       run: babel ./ -d ./bin --minified --ignore 'node_modules/'
     - name: Build the Docker image
       run: |
+        rm -fr node_modules
         if [[ "$ARCH" == "amd64" ]]; then export QEMU_BIN="qemu-x86_64-static"; fi
         if [[ "$ARCH" == "armhf" ]]; then export QEMU_BIN="qemu-arm-static"; fi
         if [[ "$ARCH" == "arm64v8" ]]; then export QEMU_BIN="qemu-aarch64-static"; fi
