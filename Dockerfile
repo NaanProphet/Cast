@@ -16,8 +16,6 @@ COPY ./intern/streams/icy /opt/cast/intern/streams/icy
 COPY ./public /opt/cast/public
 WORKDIR /opt/cast/
 
-RUN npm install -g nan
-RUN npm install git://github.com/meyskens/node-ogg.git # patch for failing npm install
 RUN npm install
 
 CMD node server.js
