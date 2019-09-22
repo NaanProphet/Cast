@@ -1,0 +1,67 @@
+name: Node CI
+
+on: [push,pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x,12.x]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install babel
+      run: npm -g install babel-cli
+    - name: npm install, build, and test
+      run: |
+        npm install
+        npm run build --if-present
+        npm test
+      env:
+        CI: true
+    - name: Run babel
+      run: babel ./ -d ./bin --minified --ignore 'node_modules/'
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
+        arch:
+          - amd64
+          - armhf
+          - arm64
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install babel
+      run: npm -g install babel-cli
+    - name: Install qemu
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install qemu qemu-user-static
+        docker run --rm --privileged multiarch/qemu-user-static:register
+    - name: Run babel
+      run: babel ./ -d ./bin --minified --ignore 'node_modules/'
+    - name: Build the Docker image
+      run: |
+        if [[ "$ARCH" == "amd64" ]]; then export QEMU_BIN="qemu-x86_64-static"; fi
+        if [[ "$ARCH" == "armhf" ]]; then export QEMU_BIN="qemu-arm-static"; fi
+        if [[ "$ARCH" == "arm64v8" ]]; then export QEMU_BIN="qemu-aarch64-static"; fi
+        cp /usr/bin/$QEMU_BIN ./
+        docker build . --build-arg="ARCH=$ARCH" --build-arg="QEMU_BIN=$QEMU_BIN" --file Dockerfile --tag docker.pkg.github.com/innovate-technologies/Cast/$ARCH:latest
+      env:
+        ARCH: ${{ matrix.arch }}
+    - name: Docker login
+      if: github.event_name == 'push' && github.event.branch == 'master'
+      run: echo TODO
+    - name: Docker push
+      if: github.event_name == 'push' && github.event.branch == 'master'
+      run: echo TODO
