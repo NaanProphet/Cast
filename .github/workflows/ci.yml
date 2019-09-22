@@ -57,7 +57,7 @@ jobs:
         rm -fr node_modules
         if [[ "$ARCH" == "amd64" ]]; then export QEMU_BIN="qemu-x86_64-static"; export ARCHREPO=amd64; fi
         if [[ "$ARCH" == "armhf" ]]; then export QEMU_BIN="qemu-arm-static"; export ARCHREPO=arm32v7; fi
-        if [[ "$ARCH" == "arm64v8" ]]; then export QEMU_BIN="qemu-aarch64-static"; export ARCHREPO=arm64v8; fi
+        if [[ "$ARCH" == "arm64" ]]; then export QEMU_BIN="qemu-aarch64-static"; export ARCHREPO=arm64v8; fi
         cp /usr/bin/$QEMU_BIN ./
         docker build . --build-arg="ARCH=$ARCH" --build-arg="QEMU_BIN=$QEMU_BIN" --build-arg="ARCHREPO=$ARCHREPO" --file Dockerfile --tag docker.pkg.github.com/innovate-technologies/cast/$ARCH:latest
       env:
