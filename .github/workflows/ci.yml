@@ -48,6 +48,14 @@ jobs:
         sudo apt-get update
         sudo apt-get -y install qemu qemu-user-static
         docker run --rm --privileged multiarch/qemu-user-static:register
+        if [[ "$ARCH" == "amd64" ]]; then export export QEMU_ARCH=x86_64; fi
+        if [[ "$ARCH" == "armhf" ]]; then export export QEMU_ARCH=arm; fi
+        if [[ "$ARCH" == "arm64" ]]; then export export QEMU_ARCH=aarch64; fi
+        wget https://github.com/multiarch/qemu-user-static/releases/download/$QEMU_VER/x86_64_qemu-${QEMU_ARCH}-static.tar.gz
+        tar -xvf x86_64_qemu-${QEMU_ARCH}-static.tar.gz;
+      env:
+        QEMU_VER: v4.1.0-1
+        ARCH: ${{ matrix.arch }}
     - name: npm install
       run: npm install
     - name: Run babel
@@ -55,18 +63,17 @@ jobs:
     - name: Build the Docker image
       run: |
         rm -fr node_modules
-        if [[ "$ARCH" == "amd64" ]]; then export QEMU_BIN="qemu-x86_64-static"; export ARCHREPO=amd64; export QEMU_ARCH=x86_64; fi
-        if [[ "$ARCH" == "armhf" ]]; then export QEMU_BIN="qemu-arm-static"; export ARCHREPO=arm32v7; export QEMU_ARCH=arm; fi
-        if [[ "$ARCH" == "arm64" ]]; then export QEMU_BIN="qemu-aarch64-static"; export ARCHREPO=arm64v8; export QEMU_ARCH=aarch64; fi
-        cp /usr/bin/$QEMU_BIN ./
-        docker build . --build-arg="ARCH=$ARCH" --build-arg="QEMU_BIN=$QEMU_BIN" --build-arg="ARCHREPO=$ARCHREPO" --build-arg "QEMU_ARCH=$QEMU_ARCH" --file Dockerfile --tag docker.pkg.github.com/innovate-technologies/cast/$ARCH:latest
+        if [[ "$ARCH" == "amd64" ]]; then export ARCHREPO=amd64; export QEMU_ARCH=x86_64; fi
+        if [[ "$ARCH" == "armhf" ]]; then export ARCHREPO=arm32v7; export QEMU_ARCH=arm; fi
+        if [[ "$ARCH" == "arm64" ]]; then export ARCHREPO=arm64v8; export QEMU_ARCH=aarch64; fi
+        docker build . --build-arg="ARCH=$ARCH" --build-arg="ARCHREPO=$ARCHREPO" --build-arg "QEMU_ARCH=$QEMU_ARCH" --file Dockerfile --tag docker.pkg.github.com/innovate-technologies/cast/$ARCH:latest
       env:
         ARCH: ${{ matrix.arch }}
     - name: Docker login
-      if: github.event_name == 'push' && github.ref == 'master'
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
     - name: Docker push master
-      if: github.event_name == 'push' && github.ref == 'master'
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: |
         docker tag docker.pkg.github.com/innovate-technologies/cast/$ARCH:latest innovate/cast:$ARCH-master
         docker tag docker.pkg.github.com/innovate-technologies/cast/$ARCH:latest innovate/cast:$ARCH-$GITHUB_SHA
