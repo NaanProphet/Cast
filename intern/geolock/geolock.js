@@ -24,8 +24,10 @@ export async function isAllowed(ip) {
         if (!ipLocation) {
             return config.geolock.allowUnknown ? true : false
         }
-        if (config.geolock.countryCodes.indexOf(ipLocation.country.iso_code) === -1) {
-            return !isAllowlistMode
+        if (isAllowlistMode) {
+          return config.geolock.countryCodes.indexOf(ipLocation.country.iso_code) > -1
+        } else {
+          return config.geolock.countryCodes.indexOf(ipLocation.country.iso_code) === -1
         }
     } catch (error) {
         console.log(error)

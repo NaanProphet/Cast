@@ -17,7 +17,7 @@ matrix:
     env: TYPE=docker ARCH=arm64 ARCHREPO=arm64v8 QEMU_ARCH=aarch64
 env:
   global:
-  - QEMU_VER=v2.9.1
+  - QEMU_VER=v4.1.0-1
   - DOCKER_REPO=innovate/cast
 addons:
   apt:
