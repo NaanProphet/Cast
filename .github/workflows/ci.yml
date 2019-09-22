@@ -1,6 +1,6 @@
 name: Node CI
 
-on: [push,pull_request]
+on: [push,pull_request,release]
 
 jobs:
   test:
@@ -64,7 +64,20 @@ jobs:
         ARCH: ${{ matrix.arch }}
     - name: Docker login
       if: github.event_name == 'push' && github.event.branch == 'master'
-      run: echo TODO
-    - name: Docker push
+      run: echo ${{ matrix.DOCKER_PASSWORD }} | docker login -u ${{ matrix.DOCKER_USERNAME }} --password-stdin
+    - name: Docker push master
       if: github.event_name == 'push' && github.event.branch == 'master'
-      run: echo TODO
+      run: |
+        docker tag docker.pkg.github.com/innovate-technologies/cast/$ARCH:latest innovate/cast:$ARCH-master
+        docker tag docker.pkg.github.com/innovate-technologies/cast/$ARCH:latest innovate/cast:$ARCH-$GITHUB_SHA
+        docker push innovate/cast:$ARCH-master
+        docker push innovate/cast:$ARCH-$GITHUB_SHA
+      env:
+        ARCH: ${{ matrix.arch }}
+    - name: Docker push tag
+      if: github.event_name == 'release'
+      run: |
+        docker tag docker.pkg.github.com/innovate-technologies/cast/$ARCH:latest innovate/cast:$ARCH-$GITHUB_REF
+        docker push innovate/cast:$ARCH-$GITHUB_REF
+      env:
+        ARCH: ${{ matrix.arch }}
