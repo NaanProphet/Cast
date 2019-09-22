@@ -1,0 +1,10 @@
+name: Linting check
+
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ESLint checks
+        uses: gimenete/eslint-action@1.0
