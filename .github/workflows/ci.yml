@@ -63,10 +63,10 @@ jobs:
       env:
         ARCH: ${{ matrix.arch }}
     - name: Docker login
-      if: github.event_name == 'push' && github.event.branch == 'master'
+      if: github.event_name == 'push' && github.ref == 'master'
       run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
     - name: Docker push master
-      if: github.event_name == 'push' && github.event.branch == 'master'
+      if: github.event_name == 'push' && github.ref == 'master'
       run: |
         docker tag docker.pkg.github.com/innovate-technologies/cast/$ARCH:latest innovate/cast:$ARCH-master
         docker tag docker.pkg.github.com/innovate-technologies/cast/$ARCH:latest innovate/cast:$ARCH-$GITHUB_SHA
