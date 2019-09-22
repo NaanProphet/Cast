@@ -1,5 +1,5 @@
 ARG ARCHREPO
-FROM ${ARCHREPO}/node:10-stretch
+FROM ${ARCHREPO}/node:10
 
 ENV NODE_ENV=production
 ENV COMPILED=true
@@ -16,6 +16,7 @@ COPY ./intern/streams/icy /opt/cast/intern/streams/icy
 COPY ./public /opt/cast/public
 WORKDIR /opt/cast/
 
+RUN npm install git://github.com/meyskens/node-ogg.git # patch for failing npm install
 RUN npm install
 
 CMD node server.js
