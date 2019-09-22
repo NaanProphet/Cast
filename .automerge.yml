@@ -1,0 +1,9 @@
+merge:
+  whitelist:
+    # a PR must have these labels set
+    labels: ["automerge"]
+  blacklist:
+    # a PR may not have these labels set
+    labels: ["wip"]
+  method: squash
+  delete_after_merge: true
