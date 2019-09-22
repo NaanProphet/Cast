@@ -1,5 +1,5 @@
 ARG ARCHREPO
-FROM ${ARCHREPO}/node:10-stretch
+FROM ${ARCHREPO}/node:10
 
 ENV NODE_ENV=production
 ENV COMPILED=true
