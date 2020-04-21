@@ -31,7 +31,7 @@
     "http-stack": "~0.1.3",
     "http2": "~3.3.7",
     "maxmind": "^2.12.0",
-    "nan": "^2.14.0",
+    "nan": "^2.14.1",
     "ogg": "git://github.com/meyskens/node-ogg.git",
     "pug": "^2.0.4",
     "restler": "~3.4.0",
